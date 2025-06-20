@@ -4,8 +4,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-// REGISTER
-router.post('/signup', async (req, res) => {
+// ✅ REGISTER
+router.post('/register', async (req, res) => {
   const { username, email, password } = req.body;
   try {
     const userExist = await User.findOne({ email });
@@ -17,11 +17,12 @@ router.post('/signup', async (req, res) => {
     await newUser.save();
     res.status(201).json({ msg: 'User registered successfully' });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ msg: 'Server error' });
   }
 });
 
-// LOGIN
+// ✅ LOGIN
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -31,12 +32,18 @@ router.post('/login', async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ msg: 'Invalid credentials' });
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: '7d',
-    });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
-    res.json({ token, user: { id: user._id, username: user.username, email: user.email } });
+    res.json({
+      token,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email
+      }
+    });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ msg: 'Server error' });
   }
 });

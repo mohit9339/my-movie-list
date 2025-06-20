@@ -4,7 +4,7 @@ const User = require('../models/User');
 const Movie = require('../models/Movie');
 const jwt = require('jsonwebtoken');
 
-// 🔐 Middleware to protect routes
+// ✅ Middleware to verify token
 function verifyToken(req, res, next) {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) return res.status(401).json({ msg: 'No token provided' });
@@ -18,7 +18,7 @@ function verifyToken(req, res, next) {
   }
 }
 
-// 🔸 Add movie to list
+// ✅ Add movie to a list
 router.post('/:listType', verifyToken, async (req, res) => {
   const { listType } = req.params; // favorites, watched, recommended
   const { tmdbId, title, poster, type, genre, year } = req.body;
@@ -42,11 +42,12 @@ router.post('/:listType', verifyToken, async (req, res) => {
 
     res.json({ msg: `Added to ${listType}` });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ msg: 'Server error' });
   }
 });
 
-// 🔸 Remove movie from list
+// ✅ Remove movie from list
 router.delete('/:listType/:tmdbId', verifyToken, async (req, res) => {
   const { listType, tmdbId } = req.params;
 
@@ -64,11 +65,12 @@ router.delete('/:listType/:tmdbId', verifyToken, async (req, res) => {
 
     res.json({ msg: `Removed from ${listType}` });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ msg: 'Server error' });
   }
 });
 
-// 🔸 Get all movies from list
+// ✅ Get all movies from a list
 router.get('/:listType', verifyToken, async (req, res) => {
   const { listType } = req.params;
 
@@ -80,6 +82,7 @@ router.get('/:listType', verifyToken, async (req, res) => {
     const user = await User.findById(req.userId).populate(listType);
     res.json(user[listType]);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ msg: 'Server error' });
   }
 });
