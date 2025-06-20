@@ -8,26 +8,33 @@ const listRoutes = require('./routes/listRoutes');
 
 const app = express();
 
-// Middleware
-app.use(cors());
+// ✅ CORS setup — allow your frontend to access this backend
+app.use(cors({
+  origin: ['https://my-movie-list-zf9p.vercel.app'], // ← Replace with your actual Vercel frontend URL
+  methods: ['GET', 'POST', 'DELETE'],
+  credentials: true
+}));
+
+// Body parser
 app.use(express.json());
 
-// Connect MongoDB
+// ✅ MongoDB connection
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 }).then(() => console.log('✅ MongoDB connected'))
   .catch((err) => console.error('❌ MongoDB connection error:', err));
 
-// Routes
+// ✅ Basic health check route
 app.get('/', (req, res) => {
   res.send('🎬 Movie API is working');
 });
 
+// ✅ Routes
 app.use('/api/auth', authRoutes);  // Register/Login
 app.use('/api/list', listRoutes);  // Favorites / Watched / Recommended
 
-// Start server
+// ✅ Server startup
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
