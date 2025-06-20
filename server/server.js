@@ -8,8 +8,11 @@ const listRoutes = require('./routes/listRoutes');
 
 const app = express();
 
-// ✅ Step 1: CORS configuration with origin + preflight
-const allowedOrigins = ['https://my-movie-list-zf9p.vercel.app'];
+// ✅ Step 1: Updated CORS configuration with correct domain
+const allowedOrigins = [
+  'https://my-movie-list-three.vercel.app', // ✅ <-- your current frontend
+  'http://localhost:5173'                   // optional for local testing
+];
 
 app.use(cors({
   origin: function (origin, callback) {
@@ -23,13 +26,13 @@ app.use(cors({
   credentials: true
 }));
 
-// ✅ Step 2: Preflight response support
+// ✅ Step 2: Preflight support
 app.options('*', cors());
 
-// ✅ Step 3: JSON parsing
+// ✅ Step 3: JSON body parser
 app.use(express.json());
 
-// ✅ DB Connection
+// ✅ MongoDB connection
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -41,7 +44,7 @@ app.get('/', (req, res) => res.send('🎬 Movie API is working'));
 app.use('/api/auth', authRoutes);
 app.use('/api/list', listRoutes);
 
-// ✅ Server Start
+// ✅ Server start
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
